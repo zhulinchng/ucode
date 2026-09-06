@@ -89,6 +89,19 @@ class TestHelp:
         for tool in TOOLS:
             assert tool in result.output
 
+    def test_managed_authoring_is_hidden_from_top_level_help_but_runnable(self):
+        # `ug setup` / `ug publish` are hidden while workspace-managed configs are still in
+        # development and unramped (gated behind ENABLE_MANAGED_AGENT_CONFIG). They must stay
+        # invokable, just not advertised. `ug export` (read-only, any user) is still listed.
+        # Match on the command descriptions, not the bare word "setup" (which also appears in
+        # doctor's help text), and flatten Typer's line-wrapping + box characters first.
+        flat = re.sub(r"[│╭╮╯╰─\s]+", " ", _strip_ansi(runner.invoke(app, ["--help"]).output))
+        assert "Author the workspace's managed" not in flat
+        assert "Publish this workspace's managed" not in flat
+        assert "Export this workspace's managed" in flat
+        assert runner.invoke(app, ["setup", "--help"]).exit_code == 0
+        assert runner.invoke(app, ["publish", "--help"]).exit_code == 0
+
     @pytest.mark.parametrize("prog_name", ["ug", "ucode"])
     def test_help_uses_invoked_name_and_names_ucode_as_an_alias(self, prog_name):
         result = runner.invoke(app, ["--help"], prog_name=prog_name)

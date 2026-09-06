@@ -1171,6 +1171,7 @@ setup_app = typer.Typer(add_completion=False, no_args_is_help=False)
 app.add_typer(
     setup_app,
     name="setup",
+    hidden=True,
     help="Author the workspace's managed coding config (admins only). See `ug setup help`.",
 )
 
@@ -3284,7 +3285,7 @@ def setup_show_cmd() -> None:
         raise typer.Exit(code)
 
 
-@app.command("publish")
+@app.command("publish", hidden=True)
 def publish_cmd(
     file_path: Annotated[
         str | None,
