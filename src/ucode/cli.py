@@ -2419,7 +2419,8 @@ def _launch_managed_default(
     if not current:
         raise RuntimeError("No workspace configured. Run `ug configure` first.")
     apply_pat_environment(state)
-    # --dry-run avoids the fetch but still applies the last saved config.
+    # --dry-run doesn't fetch, so default the feature-disabled flag rather than leave it unbound.
+    coding_agent_config_feature_disabled = False
     if dry_run:
         managed = load_managed_state(current)
     else:
